@@ -44,6 +44,51 @@ python run.py
 
 The server will run on `http://localhost:8000`
 
+## Deployment to Vercel
+
+This application is configured for deployment on Vercel.
+
+### Prerequisites
+- A Vercel account
+- Vercel CLI installed (optional): `npm i -g vercel`
+
+### Deployment Steps
+
+1. **Install Vercel CLI** (if not already installed):
+   ```bash
+   npm i -g vercel
+   ```
+
+2. **Deploy from command line**:
+   ```bash
+   vercel
+   ```
+   Follow the prompts to link your project or create a new one.
+
+3. **Or deploy via Vercel Dashboard**:
+   - Go to [vercel.com](https://vercel.com)
+   - Click "New Project"
+   - Import your Git repository
+   - Vercel will automatically detect the Python project and use the `vercel.json` configuration
+
+4. **Set Environment Variables** (optional but recommended):
+   In your Vercel project settings, add these environment variables:
+   - `SUPABASE_URL`: Your Supabase project URL
+   - `SUPABASE_KEY`: Your Supabase anon key
+   - `ALLOWED_ORIGINS`: Comma-separated list of allowed CORS origins (optional)
+
+   If not set, the app will use default values from the code.
+
+5. **Deploy**:
+   - Vercel will automatically build and deploy your application
+   - Your API will be available at `https://your-project.vercel.app`
+
+### Project Structure for Vercel
+- `vercel.json`: Vercel configuration file
+- `api/index.py`: Entry point for Vercel serverless functions
+- `app/`: Main application code
+- `.vercelignore`: Files to exclude from deployment
+
 ## API Endpoints
 
 - **AI Nose**: `POST /api/ai-nose/analyze`

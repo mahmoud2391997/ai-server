@@ -1,14 +1,32 @@
+import os
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from app.routers import ai_nose, mood_advisor, skin_analyzer, occasion_detector, style_matcher, longevity_meter, perfume_memory, personality_map, gift_selector, description_generator, bottle_renderer, price_optimizer
 
 app = FastAPI(title="Aura AI Server", version="1.0.0")
 
-# CORS middleware
+# CORS middleware - Allow all origins for Vercel deployment
+# You can restrict this by setting ALLOWED_ORIGINS environment variable
+allowed_origins_env = os.getenv("ALLOWED_ORIGINS")
+if allowed_origins_env:
+    allowed_origins = allowed_origins_env.split(",")
+else:
+    # Default to localhost for development
+    allowed_origins = ["http://localhost:5173", "http://localhost:3000", "http://localhost:3001"]
+    # In production (Vercel), if no ALLOWED_ORIGINS is set, allow all origins
+    # Note: When using allow_credentials=True, we can't use ["*"], so we'll allow all by not restricting
+    if os.getenv("VERCEL") or os.getenv("VERCEL_ENV"):
+        # For Vercel, allow all origins by using a wildcard pattern
+        # But we need to set allow_credentials=False when using wildcard
+        allowed_origins = ["*"]
+
+# Set credentials based on whether we're using wildcard
+use_credentials = "*" not in allowed_origins
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:5173", "http://localhost:3000", "http://localhost:3001"],
-    allow_credentials=True,
+    allow_origins=allowed_origins,
+    allow_credentials=use_credentials,
     allow_methods=["*"],
     allow_headers=["*"],
 )

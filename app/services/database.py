@@ -3,9 +3,15 @@ from supabase import create_client, Client
 from typing import List, Dict, Any, Optional
 from app.models.schemas import PerfumeData, PerfumeRecommendation
 
-# Supabase configuration
-SUPABASE_URL = "https://xroixqfaaqelcitaubfx.supabase.co"
-SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inhyb2l4cWZhYXFlbGNpdGF1YmZ4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjQzMjk5ODQsImV4cCI6MjA3OTkwNTk4NH0.h_DYktyQrOiXSMl0TYqrgW6BtmxL4Fj2t64FHB6nB9w"
+# Supabase configuration - use environment variables if available, otherwise fall back to defaults
+SUPABASE_URL = os.getenv(
+    "SUPABASE_URL",
+    "https://xroixqfaaqelcitaubfx.supabase.co"
+)
+SUPABASE_KEY = os.getenv(
+    "SUPABASE_KEY",
+    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inhyb2l4cWZhYXFlbGNpdGF1YmZ4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjQzMjk5ODQsImV4cCI6MjA3OTkwNTk4NH0.h_DYktyQrOiXSMl0TYqrgW6BtmxL4Fj2t64FHB6nB9w"
+)
 
 supabase: Client = create_client(SUPABASE_URL, SUPABASE_KEY)
 
