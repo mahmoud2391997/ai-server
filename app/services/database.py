@@ -13,11 +13,22 @@ SUPABASE_KEY = os.getenv(
     "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inhyb2l4cWZhYXFlbGNpdGF1YmZ4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjQzMjk5ODQsImV4cCI6MjA3OTkwNTk4NH0.h_DYktyQrOiXSMl0TYqrgW6BtmxL4Fj2t64FHB6nB9w"
 )
 
-supabase: Client = create_client(SUPABASE_URL, SUPABASE_KEY)
+# Lazy initialization of Supabase client to avoid import-time errors
+_supabase_client: Optional[Client] = None
+
+def get_supabase_client() -> Client:
+    """Get or create Supabase client with lazy initialization.
+    Lazy initialization prevents import-time errors in serverless environments like Vercel.
+    """
+    global _supabase_client
+    if _supabase_client is None:
+        _supabase_client = create_client(SUPABASE_URL, SUPABASE_KEY)
+    return _supabase_client
 
 async def get_perfumes_with_ai_attributes(filters: Optional[Dict[str, Any]] = None) -> List[PerfumeData]:
     """Get perfumes with AI attributes from database"""
     try:
+        supabase = get_supabase_client()
         # Build the query to join perfumes with ai_attributes
         query = supabase.from_('perfumes').select(
             'perfume_id, name, brand, gender, concentration, price, ml_size, description_llm, '
@@ -67,6 +78,7 @@ async def get_perfumes_with_ai_attributes(filters: Optional[Dict[str, Any]] = No
 async def get_customer_profile(customer_id: str) -> Optional[Dict[str, Any]]:
     """Get customer profile from database"""
     try:
+        supabase = get_supabase_client()
         result = supabase.from_('customers').select('*').eq('customer_id', customer_id).execute()
         if result.data:
             return result.data[0]
