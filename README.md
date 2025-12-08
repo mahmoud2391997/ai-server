@@ -44,6 +44,26 @@ python run.py
 
 The server will run on `http://localhost:8000`
 
+## Weather API Setup
+
+The application uses OpenWeather API to fetch real-time weather data based on user location. To enable this feature:
+
+1. **Get an API Key**:
+   - Sign up at [OpenWeatherMap](https://openweathermap.org/api)
+   - Get your free API key from the dashboard
+
+2. **Set Environment Variable**:
+   - Create a `.env` file in the `ai-server` directory (if it doesn't exist)
+   - Add your API key:
+     ```
+     OPENWEATHER_API_KEY=your_api_key_here
+     ```
+   
+3. **Restart the Server**:
+   - After adding the API key, restart the FastAPI server for changes to take effect
+
+**Note**: If the API key is not set, the application will use default mock weather data (Riyadh, Saudi Arabia with moderate weather).
+
 ## Deployment to Vercel
 
 This application is configured for deployment on Vercel.
@@ -75,6 +95,7 @@ This application is configured for deployment on Vercel.
    In your Vercel project settings, add these environment variables:
    - `SUPABASE_URL`: Your Supabase project URL
    - `SUPABASE_KEY`: Your Supabase anon key
+   - `OPENWEATHER_API_KEY`: Your OpenWeather API key (for weather features)
    - `ALLOWED_ORIGINS`: Comma-separated list of allowed CORS origins (optional)
 
    If not set, the app will use default values from the code.
@@ -103,6 +124,7 @@ This application is configured for deployment on Vercel.
 - **Description Generator**: `POST /api/description-generator/generate`
 - **Bottle Renderer**: `POST /api/bottle-renderer/render`
 - **Price Optimizer**: `POST /api/price-optimizer/optimize`
+- **Weather**: `POST /api/weather/get-weather` - Get weather, location, and time data based on coordinates
 
 ## Request Format
 
