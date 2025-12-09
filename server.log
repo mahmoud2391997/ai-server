@@ -1028,3 +1028,57 @@ Traceback (most recent call last):
            ^^^^^^^^^^^^
 AttributeError: 'str' object has no attribute 'get'
 INFO:     127.0.0.1:53798 - "POST /api/ai-nose/analyze HTTP/1.1" 500 Internal Server Error
+INFO:     127.0.0.1:49752 - "OPTIONS /api/weather/get-weather HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49753 - "OPTIONS /api/weather/get-weather HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49752 - "POST /api/weather/get-weather HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49761 - "POST /api/weather/get-weather HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63504 - "GET /api/ai/prompts?feature=ai-nose HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63504 - "GET /api/ai/prompts?feature=ai-nose HTTP/1.1" 200 OK
+INFO:     127.0.0.1:64440 - "OPTIONS /api/ai-nose/analyze HTTP/1.1" 200 OK
+AI Nose processing failed
+Traceback (most recent call last):
+  File "/Users/mahmoudelsayed/Documents/GitHub/aura-ai/ai-server/app/routers/ai_nose.py", line 55, in analyze_ai_nose
+    city = location.get('city')
+           ^^^^^^^^^^^^
+AttributeError: 'str' object has no attribute 'get'
+INFO:     127.0.0.1:64440 - "POST /api/ai-nose/analyze HTTP/1.1" 500 Internal Server Error
+AI Nose processing failed
+Traceback (most recent call last):
+  File "/Users/mahmoudelsayed/Documents/GitHub/aura-ai/ai-server/app/routers/ai_nose.py", line 55, in analyze_ai_nose
+    city = location.get('city')
+           ^^^^^^^^^^^^
+AttributeError: 'str' object has no attribute 'get'
+INFO:     127.0.0.1:54842 - "POST /api/ai-nose/analyze HTTP/1.1" 500 Internal Server Error
+INFO:     127.0.0.1:54075 - "GET /api/ai/prompts?feature=ai-nose HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54075 - "GET /api/ai/prompts?feature=ai-nose HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60752 - "GET /api/ai/prompts?feature=ai-nose HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60752 - "GET /api/ai/prompts?feature=ai-nose HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60805 - "OPTIONS /api/ai-nose/analyze HTTP/1.1" 200 OK
+AI Nose processing failed
+Traceback (most recent call last):
+  File "/Users/mahmoudelsayed/Documents/GitHub/aura-ai/ai-server/app/routers/ai_nose.py", line 55, in analyze_ai_nose
+    city = location.get('city')
+           ^^^^^^^^^^^^
+AttributeError: 'str' object has no attribute 'get'
+INFO:     127.0.0.1:60805 - "POST /api/ai-nose/analyze HTTP/1.1" 500 Internal Server Error
+INFO:     127.0.0.1:64808 - "GET /api/ai/prompts?feature=ai-nose HTTP/1.1" 200 OK
+INFO:     127.0.0.1:64808 - "GET /api/ai/prompts?feature=ai-nose HTTP/1.1" 200 OK
+AI Nose processing failed
+Traceback (most recent call last):
+  File "/Users/mahmoudelsayed/Documents/GitHub/aura-ai/ai-server/app/routers/ai_nose.py", line 55, in analyze_ai_nose
+    city = location.get('city')
+           ^^^^^^^^^^^^
+AttributeError: 'str' object has no attribute 'get'
+INFO:     127.0.0.1:64902 - "POST /api/ai-nose/analyze HTTP/1.1" 500 Internal Server Error
+AI Nose processing failed
+Traceback (most recent call last):
+  File "/Users/mahmoudelsayed/Documents/GitHub/aura-ai/ai-server/app/routers/ai_nose.py", line 55, in analyze_ai_nose
+    city = location.get('city')
+           ^^^^^^^^^^^^
+AttributeError: 'str' object has no attribute 'get'
+INFO:     127.0.0.1:65102 - "POST /api/ai-nose/analyze HTTP/1.1" 500 Internal Server Error
+INFO:     Shutting down
+INFO:     Waiting for application shutdown.
+INFO:     Application shutdown complete.
+INFO:     Finished server process [80335]
+INFO:     Stopping reloader process [74229]

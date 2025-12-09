@@ -49,9 +49,9 @@ async def analyze_ai_nose(request: MultiModalRequest):
             location = context_data.get('location')
             time_str = context_data.get('time')
 
-            if weather:
+            if weather and isinstance(weather, dict):
                 weather_context = f"الطقس: {weather.get('description', 'غير محدد')}, درجة الحرارة: {weather.get('temperature', 'غير محددة')}°م"
-            if location:
+            if location and isinstance(location, dict):
                 city = location.get('city')
                 country = location.get('country')
                 if city or country:
@@ -63,8 +63,8 @@ async def analyze_ai_nose(request: MultiModalRequest):
         recommendations = await get_perfume_recommendations(
             mood=mood,
             occasion=occasion,
-            skin_type=request.options.get('skin_type') if request.options else None,
-            gender=request.options.get('gender') if request.options else None,
+            skin_type=options_data.get('skin_type') if options_data else None,
+            gender=options_data.get('gender') if options_data else None,
             limit=3
         )
         
