@@ -8,8 +8,14 @@ import edge_tts.exceptions
 import io
 import tempfile
 import os
+import httpx
 
 logger = logging.getLogger(__name__)
+
+# Set NO_PROXY at module level to prevent edge_tts from using proxy
+# This needs to be set before edge_tts initializes its HTTP client
+os.environ.setdefault('NO_PROXY', '*')
+os.environ.setdefault('no_proxy', '*')
 
 router = APIRouter()
 
@@ -47,15 +53,43 @@ async def synthesize_speech(request: TTSRequest):
         voice = request.voice or "ar-SA-HamedNeural"  # Arabic male voice
         
         logger.info(f"Generating speech with voice: {voice}")
+        logger.info(f"Current proxy env vars: HTTP_PROXY={os.environ.get('HTTP_PROXY', 'None')}, HTTPS_PROXY={os.environ.get('HTTPS_PROXY', 'None')}")
         
-        # Generate speech using edge_tts
-        communicate = edge_tts.Communicate(
-            text=request.text,
-            voice=voice,
-            rate=request.rate or "+0%",
-            pitch=request.pitch or "+0Hz",
-            volume=request.volume or "+0%"
-        )
+        # Create httpx client without proxy for edge_tts
+        # edge_tts uses httpx internally, so we need to ensure no proxy is used
+        # Temporarily unset proxy env vars and use a custom httpx client if possible
+        old_proxy_vars = {}
+        proxy_vars = ['HTTP_PROXY', 'http_proxy', 'HTTPS_PROXY', 'https_proxy', 'ALL_PROXY', 'all_proxy']
+        
+        # Save and unset proxy variables
+        for var in proxy_vars:
+            if var in os.environ:
+                old_proxy_vars[var] = os.environ[var]
+                logger.info(f"Unsetting proxy var: {var}={os.environ[var]}")
+                del os.environ[var]
+        
+        logger.info(f"After unsetting proxies, NO_PROXY={os.environ.get('NO_PROXY', 'None')}")
+        
+        try:
+            # Generate speech using edge_tts
+            # The NO_PROXY set at module level should help, but we also ensure proxy vars are unset
+            logger.info("Creating edge_tts.Communicate object...")
+            communicate = edge_tts.Communicate(
+                text=request.text,
+                voice=voice,
+                rate=request.rate or "+0%",
+                pitch=request.pitch or "+0Hz",
+                volume=request.volume or "+0%"
+            )
+            logger.info("edge_tts.Communicate object created successfully")
+        except Exception as comm_error:
+            logger.exception(f"Error creating Communicate object: {type(comm_error).__name__}: {str(comm_error)}")
+            raise
+        finally:
+            # Restore proxy environment variables
+            for var, value in old_proxy_vars.items():
+                os.environ[var] = value
+                logger.info(f"Restored proxy var: {var}")
         
         # Use temporary file for save() method (it requires a file path)
         temp_path = None
@@ -65,7 +99,16 @@ async def synthesize_speech(request: TTSRequest):
                 temp_path = temp_file.name
             
             # Save audio to temporary file
-            await communicate.save(temp_path)
+            logger.info(f"Saving audio to temp file: {temp_path}")
+            try:
+                await communicate.save(temp_path)
+                logger.info("Audio save() completed")
+            except Exception as save_error:
+                logger.exception(f"Error in communicate.save(): {type(save_error).__name__}: {str(save_error)}")
+                logger.error(f"Full traceback for save error:")
+                import traceback
+                logger.error(traceback.format_exc())
+                raise
             
             # Read audio bytes from file
             with open(temp_path, 'rb') as f:
@@ -88,7 +131,28 @@ async def synthesize_speech(request: TTSRequest):
             logger.info(f"TTS generation successful: {len(audio_bytes)} bytes")
             
         except edge_tts.exceptions.NoAudioReceived as e:
-            logger.error(f"edge_tts NoAudioReceived error: {str(e)}")
+            logger.error("=" * 60)
+            logger.error("TTS ERROR: NoAudioReceived")
+            logger.error("=" * 60)
+            logger.error(f"Error message: {str(e)}")
+            logger.error(f"Text: {request.text[:50]}...")
+            logger.error(f"Voice: {voice}")
+            logger.error(f"Rate: {request.rate}, Pitch: {request.pitch}, Volume: {request.volume}")
+            logger.error("")
+            logger.error("This error occurs when:")
+            logger.error("1. Edge TTS service is reachable (can get metadata)")
+            logger.error("2. But the audio streaming connection is blocked")
+            logger.error("")
+            logger.error("Common causes:")
+            logger.error("- Proxy/firewall blocking WebSocket or streaming connections")
+            logger.error("- Network restrictions on specific Edge TTS endpoints")
+            logger.error("- Corporate firewall blocking audio streaming")
+            logger.error("")
+            logger.error("Current environment:")
+            logger.error(f"  NO_PROXY: {os.environ.get('NO_PROXY', 'Not set')}")
+            logger.error(f"  HTTP_PROXY: {os.environ.get('HTTP_PROXY', 'Not set')}")
+            logger.error(f"  HTTPS_PROXY: {os.environ.get('HTTPS_PROXY', 'Not set')}")
+            logger.error("=" * 60)
             # Clean up temp file if it exists
             if temp_path and os.path.exists(temp_path):
                 try:
@@ -97,7 +161,7 @@ async def synthesize_speech(request: TTSRequest):
                     pass
             raise HTTPException(
                 status_code=500,
-                detail="TTS service could not generate audio. This may be due to network issues or service unavailability. Please try again later."
+                detail="TTS service could not generate audio. The Edge TTS service is reachable but audio streaming is blocked. This is often caused by proxy or firewall settings. Please check your network configuration or contact your system administrator."
             )
         except Exception as tts_error:
             logger.exception(f"Error during TTS generation: {str(tts_error)}")
@@ -175,4 +239,98 @@ async def list_arabic_voices():
         }
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Failed to list Arabic voices: {str(e)}")
+
+@router.get("/health")
+async def tts_health_check():
+    """
+    Check if TTS service is available.
+    This endpoint tests if Edge TTS can successfully generate audio.
+    
+    Returns:
+        Health status with availability information
+    """
+    try:
+        # Test 1: Can we list voices? (lightweight check)
+        try:
+            voices = await edge_tts.list_voices()
+            voice_count = len(voices)
+        except Exception as e:
+            logger.error(f"Failed to list voices in health check: {str(e)}")
+            return {
+                "status": "unavailable",
+                "available": False,
+                "reason": "Cannot connect to Edge TTS service",
+                "error": str(e),
+                "can_list_voices": False
+            }
+        
+        # Test 2: Can we actually generate audio? (more thorough check)
+        try:
+            # Try to generate a very short audio clip
+            test_text = "test"
+            communicate = edge_tts.Communicate(
+                text=test_text,
+                voice="ar-SA-HamedNeural",
+                rate="+0%",
+                pitch="+0Hz",
+                volume="+0%"
+            )
+            
+            # Try to stream audio (this is where it usually fails)
+            audio_received = False
+            async for chunk in communicate.stream():
+                if chunk["type"] == "audio":
+                    audio_received = True
+                    break  # We got at least one audio chunk, that's enough
+            
+            if audio_received:
+                return {
+                    "status": "available",
+                    "available": True,
+                    "message": "TTS service is fully operational",
+                    "can_list_voices": True,
+                    "voice_count": voice_count,
+                    "can_generate_audio": True
+                }
+            else:
+                return {
+                    "status": "unavailable",
+                    "available": False,
+                    "reason": "Audio streaming is blocked (proxy/firewall issue)",
+                    "can_list_voices": True,
+                    "voice_count": voice_count,
+                    "can_generate_audio": False,
+                    "suggestion": "Check network/proxy settings or try from a different network"
+                }
+                
+        except edge_tts.exceptions.NoAudioReceived:
+            return {
+                "status": "unavailable",
+                "available": False,
+                "reason": "Audio streaming is blocked",
+                "can_list_voices": True,
+                "voice_count": voice_count,
+                "can_generate_audio": False,
+                "suggestion": "This is often caused by proxy or firewall settings blocking the audio stream"
+            }
+        except Exception as e:
+            logger.error(f"Failed to generate test audio in health check: {str(e)}")
+            return {
+                "status": "unavailable",
+                "available": False,
+                "reason": f"Audio generation failed: {str(e)}",
+                "can_list_voices": True,
+                "voice_count": voice_count,
+                "can_generate_audio": False,
+                "error": str(e)
+            }
+            
+    except Exception as e:
+        logger.exception(f"TTS health check failed: {str(e)}")
+        return {
+            "status": "unavailable",
+            "available": False,
+            "reason": "Health check failed",
+            "error": str(e)
+        }
 

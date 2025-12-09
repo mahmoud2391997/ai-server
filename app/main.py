@@ -1,6 +1,6 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from app.routers import ai_nose, mood_advisor, skin_analyzer, occasion_detector, style_matcher, longevity_meter, perfume_memory, personality_map, gift_selector, description_generator, bottle_renderer, price_optimizer, tts, prompts, weather
+from app.routers import ai_nose, mood_advisor, skin_analyzer, occasion_detector, style_matcher, longevity_meter, perfume_memory, personality_map, gift_selector, description_generator, bottle_renderer, price_optimizer, tts, prompts, weather, admin
 
 app = FastAPI(title="Aura AI Server", version="1.0.0")
 
@@ -29,6 +29,7 @@ app.include_router(price_optimizer.router, prefix="/api/price-optimizer", tags=[
 app.include_router(prompts.router, prefix="/api/ai", tags=["Prompts"])
 app.include_router(tts.router, prefix="/api/tts", tags=["Text-to-Speech"])
 app.include_router(weather.router, prefix="/api/weather", tags=["Weather"])
+app.include_router(admin.router, prefix="/api/admin", tags=["Admin"])
 
 @app.get("/")
 async def root():

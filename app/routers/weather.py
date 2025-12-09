@@ -66,7 +66,13 @@ async def get_weather(request: WeatherRequest):
         }
         
         logger.info(f"Calling OpenWeather API for lat={request.latitude}, lon={request.longitude}")
-        response = requests.get(url, params=params, timeout=10)
+        # Disable proxy for OpenWeather API calls
+        response = requests.get(
+            url, 
+            params=params, 
+            timeout=10,
+            proxies={"http": None, "https": None}  # Bypass proxy settings
+        )
         response.raise_for_status()
         data = response.json()
         logger.info(f"Successfully fetched weather data for {data.get('name', 'unknown location')}")
