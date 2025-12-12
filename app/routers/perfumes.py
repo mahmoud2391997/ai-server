@@ -5,6 +5,7 @@ from typing import List, Optional
 from uuid import UUID, uuid4
 from app.services.database import get_supabase_client
 import logging
+import random
 
 logger = logging.getLogger(__name__)
 
@@ -46,6 +47,11 @@ class PerfumeUpdate(BaseModel):
     description_llm: Optional[str] = None
 
 
+class PerfumeListResponse(BaseModel):
+    data: List[Perfume]
+    total: int
+
+
 @router.post("/perfumes", response_model=Perfume)
 async def create_perfume(perfume: PerfumeCreate):
     try:
@@ -62,16 +68,47 @@ async def create_perfume(perfume: PerfumeCreate):
         )
 
 
-@router.get("/perfumes", response_model=List[Perfume])
-async def get_perfumes():
+@router.get("/perfumes", response_model=PerfumeListResponse)
+async def get_perfumes(page: int = 1, limit: int = 9, maxPrice: Optional[float] = None):
     try:
         supabase = get_supabase_client()
-        result = supabase.from_("perfumes").select("*").execute()
-        return [Perfume(**perfume) for perfume in result.data]
+        query = supabase.from_("perfumes").select("*")
+        
+        if maxPrice is not None:
+            query = query.lte("price", maxPrice)
+        
+        total_result = query.execute()
+        total_count = len(total_result.data)
+        
+        offset = (page - 1) * limit
+        result = query.offset(offset).limit(limit).execute()
+        return PerfumeListResponse(
+            data=[Perfume(**perfume) for perfume in result.data],
+            total=total_count
+        )
     except Exception as e:
         logger.exception(f"Error fetching perfumes: {str(e)}")
         raise HTTPException(
             status_code=500, detail=f"Failed to fetch perfumes: {str(e)}"
+        )
+
+
+@router.get("/perfumes/bestsellers")
+async def get_bestsellers():
+    try:
+        supabase = get_supabase_client()
+        result = supabase.from_("perfumes").select("*").execute()
+        if not result.data:
+            raise HTTPException(status_code=404, detail="No perfumes found")
+        
+        bestsellers = random.sample(result.data, min(4, len(result.data)))
+        return [Perfume(**perfume) for perfume in bestsellers]
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.exception(f"Error fetching bestsellers: {str(e)}")
+        raise HTTPException(
+            status_code=500, detail=f"Failed to fetch bestsellers: {str(e)}"
         )
 
 
