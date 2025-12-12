@@ -125,6 +125,7 @@ This application is configured for deployment on Vercel.
 - **Bottle Renderer**: `POST /api/bottle-renderer/render`
 - **Price Optimizer**: `POST /api/price-optimizer/optimize`
 - **Weather**: `POST /api/weather/get-weather` - Get weather, location, and time data based on coordinates
+- **Database**: `GET /api/database/all-tables` - Fetches all data from all tables in the database.
 
 ## Request Format
 

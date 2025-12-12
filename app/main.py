@@ -1,6 +1,31 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from app.routers import ai_nose, mood_advisor, skin_analyzer, occasion_detector, style_matcher, longevity_meter, perfume_memory, personality_map, gift_selector, description_generator, bottle_renderer, price_optimizer, tts, prompts, weather, admin
+from app.routers import (
+    ai_nose,
+    mood_advisor,
+    skin_analyzer,
+    occasion_detector,
+    style_matcher,
+    longevity_meter,
+    perfume_memory,
+    personality_map,
+    gift_selector,
+    description_generator,
+    bottle_renderer,
+    price_optimizer,
+    tts,
+    prompts,
+    weather,
+    admin,
+    database,
+    customers,
+    perfumes,
+    ingredients,
+    orders,
+    order_items,
+    perfume_ingredients,
+    ai_attributes,
+)
 
 app = FastAPI(title="Aura AI Server", version="1.0.0")
 
@@ -16,24 +41,58 @@ app.add_middleware(
 # Include routers
 app.include_router(ai_nose.router, prefix="/api/ai-nose", tags=["AI Nose"])
 app.include_router(mood_advisor.router, prefix="/api/mood-advisor", tags=["Mood Advisor"])
-app.include_router(skin_analyzer.router, prefix="/api/skin-analyzer", tags=["Skin Analyzer"])
-app.include_router(occasion_detector.router, prefix="/api/occasion-detector", tags=["Occasion Detector"])
-app.include_router(style_matcher.router, prefix="/api/style-matcher", tags=["Style Matcher"])
-app.include_router(longevity_meter.router, prefix="/api/longevity-meter", tags=["Longevity Meter"])
-app.include_router(perfume_memory.router, prefix="/api/perfume-memory", tags=["Perfume Memory"])
-app.include_router(personality_map.router, prefix="/api/personality-map", tags=["Personality Map"])
-app.include_router(gift_selector.router, prefix="/api/gift-selector", tags=["Gift Selector"])
-app.include_router(description_generator.router, prefix="/api/description-generator", tags=["Description Generator"])
-app.include_router(bottle_renderer.router, prefix="/api/bottle-renderer", tags=["Bottle Renderer"])
-app.include_router(price_optimizer.router, prefix="/api/price-optimizer", tags=["Price Optimizer"])
+app.include_router(
+    skin_analyzer.router, prefix="/api/skin-analyzer", tags=["Skin Analyzer"]
+)
+app.include_router(
+    occasion_detector.router, prefix="/api/occasion-detector", tags=["Occasion Detector"]
+)
+app.include_router(
+    style_matcher.router, prefix="/api/style-matcher", tags=["Style Matcher"]
+)
+app.include_router(
+    longevity_meter.router, prefix="/api/longevity-meter", tags=["Longevity Meter"]
+)
+app.include_router(
+    perfume_memory.router, prefix="/api/perfume-memory", tags=["Perfume Memory"]
+)
+app.include_router(
+    personality_map.router, prefix="/api/personality-map", tags=["Personality Map"]
+)
+app.include_router(
+    gift_selector.router, prefix="/api/gift-selector", tags=["Gift Selector"]
+)
+app.include_router(
+    description_generator.router,
+    prefix="/api/description-generator",
+    tags=["Description Generator"],
+)
+app.include_router(
+    bottle_renderer.router, prefix="/api/bottle-renderer", tags=["Bottle Renderer"]
+)
+app.include_router(
+    price_optimizer.router, prefix="/api/price-optimizer", tags=["Price Optimizer"]
+)
 app.include_router(prompts.router, prefix="/api/ai", tags=["Prompts"])
 app.include_router(tts.router, prefix="/api/tts", tags=["Text-to-Speech"])
 app.include_router(weather.router, prefix="/api/weather", tags=["Weather"])
 app.include_router(admin.router, prefix="/api/admin", tags=["Admin"])
+app.include_router(database.router, prefix="/api/database", tags=["Database"])
+app.include_router(customers.router, prefix="/api", tags=["Customers"])
+app.include_router(perfumes.router, prefix="/api", tags=["Perfumes"])
+app.include_router(ingredients.router, prefix="/api", tags=["Ingredients"])
+app.include_router(orders.router, prefix="/api", tags=["Orders"])
+app.include_router(order_items.router, prefix="/api", tags=["Order Items"])
+app.include_router(
+    perfume_ingredients.router, prefix="/api", tags=["Perfume Ingredients"]
+)
+app.include_router(ai_attributes.router, prefix="/api", tags=["AI Attributes"])
+
 
 @app.get("/")
 async def root():
     return {"message": "Aura AI Server is running"}
+
 
 @app.get("/health")
 async def health_check():
