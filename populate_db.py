@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 import asyncio
-from app.services.database import supabase
+from app.services.database import get_supabase_client
 import uuid
 
 async def populate_sample_data():
@@ -67,6 +67,7 @@ async def populate_sample_data():
     ]
     
     try:
+        supabase = get_supabase_client()
         # Insert perfumes
         result = supabase.from_('perfumes').insert(perfumes_data).execute()
         perfume_ids = [item['perfume_id'] for item in result.data]

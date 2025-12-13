@@ -1,0 +1,40 @@
+#!/bin/bash
+
+echo "=========================================="
+echo "DATABASE SCHEMA SETUP"
+echo "=========================================="
+echo ""
+
+SUPABASE_URL="https://xroixqfaaqelcitaubfx.supabase.co"
+PROJECT_REF="xroixqfaaqelcitaubfx"
+
+echo "To set up your database schema, choose one of the following options:"
+echo ""
+echo "OPTION 1: Using Supabase Dashboard (Recommended - Easiest)"
+echo "-----------------------------------------------------------"
+echo "1. Go to: $SUPABASE_URL"
+echo "2. Click 'SQL Editor' in the left sidebar"
+echo "3. Click 'New Query'"
+echo "4. Copy and paste the SQL from: database_schema.sql"
+echo "5. Click 'Run'"
+echo ""
+
+echo "OPTION 2: Using Supabase CLI (Requires linked project)"
+echo "-----------------------------------------------------------"
+echo "If you have linked your Supabase project to this directory:"
+echo "  supabase db push --linked"
+echo ""
+
+echo "OPTION 3: Direct Database Connection"
+echo "-----------------------------------------------------------"
+echo "If you have the database password, use:"
+echo "  PGPASSWORD=your_password supabase db push --db-url 'postgresql://postgres:your_password@db.$PROJECT_REF.supabase.co:5432/postgres'"
+echo ""
+
+echo "=========================================="
+echo "AFTER SETUP"
+echo "=========================================="
+echo ""
+echo "Once the database schema is created, run:"
+echo "  python3 populate_db.py"
+echo ""
