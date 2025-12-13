@@ -1,5 +1,36 @@
 # Aura AI Server
 
+Aura AI Server is a FastAPI-based backend service that provides all AI functionalities for the Aura perfume application. It offers intelligent perfume recommendations based on user inputs like mood, location, skin condition, and more.
+
+## Table of Contents
+- [Base URL](#base-url)
+- [Authentication](#authentication)
+- [Endpoints](#endpoints)
+  - [AI Nose](#ai-nose)
+  - [Mood Advisor](#mood-advisor)
+  - [Skin Analyzer](#skin-analyzer)
+  - [Occasion Detector](#occasion-detector)
+  - [Style Matcher](#style-matcher)
+  - [Longevity Meter](#longevity-meter)
+  - [Perfume Memory](#perfume-memory)
+  - [Personality Map](#personality-map)
+  - [Gift Selector](#gift-selector)
+  - [Description Generator](#description-generator)
+  - [Bottle Renderer](#bottle-renderer)
+  - [Price Optimizer](#price-optimizer)
+  - [Weather Service](#weather-service)
+  - [Database Access](#database-access)
+- [Environment Variables](#environment-variables)
+- [Deployment](#deployment)
+- [Testing the Weather Endpoint](#testing-the-weather-endpoint)
+- [Troubleshooting](#troubleshooting)
+
+## Base URL
+
+All endpoints are relative to the base URL:
+```
+# Aura AI Server
+
 FastAPI server for handling all AI features in the Aura perfume application.
 
 ## Setup
@@ -144,4 +175,3 @@ This application is configured for deployment on Vercel.
   "confidence": 0.95,
   "recommendations": ["recommendation1", "recommendation2"]
 }
-```
