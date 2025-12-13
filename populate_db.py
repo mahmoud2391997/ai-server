@@ -55,6 +55,17 @@ async def populate_sample_data():
         }
     ]
     
+    prompts_data = [
+        {
+            "feature": "ai-nose",
+            "prompt_text": "..."
+        },
+        {
+            "feature": "mood-advisor",
+            "prompt_text": "..."
+        }
+    ]
+    
     try:
         # Insert perfumes
         result = supabase.from_('perfumes').insert(perfumes_data).execute()
@@ -112,8 +123,12 @@ async def populate_sample_data():
         # Insert AI attributes
         supabase.from_('ai_attributes').insert(ai_attributes_data).execute()
         
+        # Insert prompts
+        supabase.from_('prompts').insert(prompts_data).execute()
+        
         print("✅ Database populated successfully!")
         print(f"Added {len(perfumes_data)} perfumes with AI attributes")
+        print(f"Added {len(prompts_data)} prompts")
         
     except Exception as e:
         print(f"❌ Error populating database: {e}")

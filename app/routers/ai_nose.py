@@ -47,6 +47,12 @@ async def analyze_ai_nose(request: MultiModalRequest):
         if context_data:
             weather = context_data.get('weather')
             location = context_data.get('location')
+            if isinstance(location, str):
+                try:
+                    location = json.loads(location)
+                except Exception:
+                    location = {}
+
             time_str = context_data.get('time')
 
             if weather and isinstance(weather, dict):

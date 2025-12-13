@@ -1,5 +1,6 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from app.middleware import GeminiPersonaMiddleware
 from app.routers import (
     ai_nose,
     mood_advisor,
@@ -29,7 +30,8 @@ from app.routers import (
 
 app = FastAPI(title="Aura AI Server", version="1.0.0")
 
-# CORS middleware - Allow all origins
+# Add middlewares
+app.add_middleware(GeminiPersonaMiddleware)
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
